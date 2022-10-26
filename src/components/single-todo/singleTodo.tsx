@@ -4,6 +4,7 @@ import '../styles.css';
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 import { MdDone } from "react-icons/md";
 
+
 interface Props {
     todo: Todo,
     todos: Todo[],
@@ -23,6 +24,7 @@ const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
     }
     const handleDelete = (id: number) => {
         setTodos(todos.filter((todo) => todo.id !== id));
+
     }
 
     const handleEdit = (e: React.FormEvent, id: number) => {
@@ -37,27 +39,36 @@ const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
     }, [edit]);
 
 
-    return <form className="todos__single" onSubmit={(e) => handleEdit(e, todo.id)}>
+
+    return <form className="todos__single"
+
+        onSubmit={(e) => handleEdit(e, todo.id)}
+        onBlur={(e) => handleEdit(e, todo.id)}>
         {
             edit ? (
                 <input
                     ref={inputRef}
                     type="input"
                     className="todos__single--text"
-                    value={editTodo} onChange={(e) => setEditTodo(e.target.value)} />
+                    value={editTodo}
+                    onChange={(e) => setEditTodo(e.target.value)} />
             ) : (todo.isDone ? (
                 <s className="todos__single--text">{todo.todo}</s>
             ) : (
-                <span className="todos__single--text">{todo.todo}</span>
+                <span className="todos__single--text" onDoubleClick={() => {
+                    if (!edit && !todo.isDone) {
+                        setEdit(!edit);
+                    }
+                }}>{todo.todo}</span>
             ))
         }
         <div>
-            <span className="icon" onClick={
+            {!edit && <span className="icon" onClick={
                 () => {
                     if (!edit && !todo.isDone) {
                         setEdit(!edit);
                     }
-                }}><AiFillEdit /></span>
+                }}><AiFillEdit /></span>}
             <span className="icon" onClick={() => handleDelete(todo.id)}><AiFillDelete /></span>
             <span className="icon" onClick={() => handleDone(todo.id)}><MdDone /></span>
         </div>
