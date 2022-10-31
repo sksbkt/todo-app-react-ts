@@ -3,33 +3,34 @@ import { Todo } from "../../models/model";
 import '../styles.css';
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 import { MdDone } from "react-icons/md";
+import { TodoState } from "../../hooks/context";
 
 
 interface Props {
     todo: Todo,
-    todos: Todo[],
-    setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
+
+    setTodos: any
 }
-const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
+const SingleTodo: React.FC<Props> = ({ todo, setTodos }) => {
+    const { state: { todos }, dispatch } = TodoState();
     const [edit, setEdit] = useState<boolean>(false);
     const [editTodo, setEditTodo] = useState<string>(todo.todo);
 
+    console.log(editTodo);
 
-    const handleDone = (id: number) => {
-        setTodos(todos.map(
-            (todo) =>
-                todo.id === id ? { ...todo, isDone: !todo.isDone } : todo
-        )
+    const handleDone = (todo: Todo) => {
+        setTodos(dispatch({ type: 'done', payload: todo })
         )
     }
-    const handleDelete = (id: number) => {
-        setTodos(todos.filter((todo) => todo.id !== id));
+    const handleDelete = (todo: Todo) => {
+        setTodos(dispatch({ type: 'remove', payload: todo }));
 
     }
 
-    const handleEdit = (e: React.FormEvent, id: number) => {
+    const handleEdit = (e: React.FormEvent, todo: Todo) => {
         e.preventDefault();
-        setTodos(todos.map((todo) => todo.id === id ? { ...todo, todo: editTodo } : todo));
+        // setTodos(todos.map((todo) => todo.id === id ? { ...todo, todo: editTodo } : todo));
+        dispatch({ type: 'edit', payload: todo, editText: editTodo })
         setEdit(false);
     }
     const inputRef = useRef<HTMLInputElement>(null);
@@ -42,8 +43,8 @@ const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
 
     return <form className="todos__single"
 
-        onSubmit={(e) => handleEdit(e, todo.id)}
-        onBlur={(e) => handleEdit(e, todo.id)}>
+        onSubmit={(e) => handleEdit(e, todo)}
+        onBlur={(e) => handleEdit(e, todo)}>
         {
             edit ? (
                 <input
@@ -69,8 +70,8 @@ const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
                         setEdit(!edit);
                     }
                 }}><AiFillEdit /></span>}
-            <span className="icon" onClick={() => handleDelete(todo.id)}><AiFillDelete /></span>
-            <span className="icon" onClick={() => handleDone(todo.id)}><MdDone /></span>
+            <span className="icon" onClick={() => handleDelete(todo)}><AiFillDelete /></span>
+            <span key={todo.id} className="icon" onClick={() => handleDone(todo)}><MdDone /></span>
         </div>
     </form>;
 };

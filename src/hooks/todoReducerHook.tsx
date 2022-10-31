@@ -1,24 +1,29 @@
 
 import { Todo } from "../models/model";
 
-type Actions =
-    { type: 'add', payload: string } |
-    { type: 'remove', payload: number } |
-    { type: 'done', payload: number } |
-    { type: 'edit', editTodoText: string, payload: number };
+export interface TodoProps {
+    todos: Todo[]
+}
 
-export function TodoReducer(state: Todo[], action: Actions) {
+type Actions =
+    { type: 'add', payload: Todo } |
+    { type: 'remove', payload: Todo } |
+    { type: 'done', payload: Todo } |
+    { type: 'edit', payload: Todo, editText: string };
+
+export function todoReducer(state: TodoProps, action: Actions): TodoProps {
     console.log(action.type);
     switch (action.type) {
         case 'add':
-            return [...state, { id: Date.now(), todo: action.payload, isDone: false }];
+            return { todos: [...state.todos, { id: Date.now(), todo: action.payload.todo, isDone: false }] };
         case 'remove':
-            return state.filter((todo) => todo.id !== action.payload);
+            return { todos: state.todos.filter((todo) => todo.id !== action.payload.id) };
         case 'done':
-            return state.map((todo) => todo.id === action.payload ? { ...state, isDone: !todo.isDone } : todo) as Todo[];
+            //? using '...' will put all of the other values of the object untouched
+            // return { todos: state.todos.map((todo) => todo.id === action.payload.id ? { id: todo.id, todo: todo.todo, isDone: !todo.isDone } : todo) };
+            return { todos: state.todos.map((todo) => todo.id === action.payload.id ? { ...todo, isDone: !todo.isDone } : todo) };
         case 'edit':
-            console.log("EDIT:", action);
-            return state.map((todo) => todo.id === action.payload ? { ...state, todo: action.editTodoText } : todo) as Todo[];
+            return { todos: state.todos.map((todo) => todo.id === action.payload.id ? { ...todo, todo: action.editText } : todo) };
         default:
             console.log('other');
             return state;
