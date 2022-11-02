@@ -6,11 +6,12 @@ import '../styles.css'
 
 interface Props {
     todos: Todo[],
+    activeTodos: Todo[]
     completedTodos: Todo[],
     // setCompletedTodos: React.Dispatch<React.SetStateAction<Todo[]>>
 }
 
-function TodoList({ todos, completedTodos }: Props) {
+function TodoList({ todos, completedTodos, activeTodos }: Props) {
     return (
         <div className="container">
             <Droppable droppableId="TodosList">
@@ -23,7 +24,7 @@ function TodoList({ todos, completedTodos }: Props) {
                             Active tasks
                         </span>
                         {
-                            todos.map((todo, index) => {
+                            activeTodos.map((todo, index) => {
 
                                 return (<SingleTodo
                                     index={index}
