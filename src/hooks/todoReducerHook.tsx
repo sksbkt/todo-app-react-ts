@@ -16,6 +16,8 @@ type Actions =
 export function todoReducer(state: TodoProps, action: Actions): TodoProps {
     switch (action.type) {
         case 'update-todos':
+            console.log({ todos: action.payload });
+
             return { todos: action.payload };
         case 'add':
             return { todos: [...state.todos, { id: Date.now(), todo: action.payload.todo, isDone: false }] };

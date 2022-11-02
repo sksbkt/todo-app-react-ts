@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { Todo } from "../../models/model";
 import SingleTodo from "../single-todo/singleTodo";
@@ -8,10 +8,11 @@ interface Props {
     todos: Todo[],
     activeTodos: Todo[]
     completedTodos: Todo[],
+    setInitialize: React.Dispatch<React.SetStateAction<boolean>>
     // setCompletedTodos: React.Dispatch<React.SetStateAction<Todo[]>>
 }
 
-function TodoList({ todos, completedTodos, activeTodos }: Props) {
+function TodoList({ todos, completedTodos, activeTodos, setInitialize }: Props) {
     return (
         <div className="container">
             <Droppable droppableId="TodosList">
@@ -29,7 +30,8 @@ function TodoList({ todos, completedTodos, activeTodos }: Props) {
                                 return (<SingleTodo
                                     index={index}
                                     key={todo.id}
-                                    todo={todo} />
+                                    todo={todo}
+                                    setInitialize={setInitialize} />
                                 )
                             })
                         }
@@ -55,7 +57,9 @@ function TodoList({ todos, completedTodos, activeTodos }: Props) {
                                     <SingleTodo
                                         index={index}
                                         key={todo.id}
-                                        todo={todo} />
+                                        todo={todo}
+                                        setInitialize={setInitialize}
+                                    />
                                 )
                             }
                             )

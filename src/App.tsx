@@ -11,7 +11,7 @@ const App: React.FC = () => {
   const [activeTodos, setActiveTodos] = useState<Todo[]>([]);
   const [completedTodos, setCompletedTodos] = useState<Todo[]>([]);
   const { state: { todos }, dispatch } = TodoState();
-
+  const [initialize, setInitialize] = useState<boolean>(true);
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -20,7 +20,7 @@ const App: React.FC = () => {
       //? since both field name and variable name are both todo we can skip :todo
       // setTodos([...todos, { id: Date.now(), todo, isDone: false }]);
       dispatch({ type: 'add', payload: { id: 0, todo: todo, isDone: false } })
-
+      setInitialize(true);
       setTodo('');
     }
   }
@@ -28,7 +28,6 @@ const App: React.FC = () => {
   function onDragEnd(result: DropResult) {
     const { source, destination } = result;
 
-    console.log('todos', todos);
     if (!destination) return;
     if (destination.droppableId === source.droppableId &&
       destination.index === source.index)
@@ -36,7 +35,6 @@ const App: React.FC = () => {
     let add: Todo;
     let active = activeTodos;
     let complete = completedTodos;
-    // let complete = completedTodos as Todo[];
 
 
     if (source.droppableId === 'TodosList') {
@@ -48,29 +46,40 @@ const App: React.FC = () => {
       complete.splice(source.index, 1);
     }
     if (destination.droppableId === 'TodosList') {
+      add.isDone = false;
       active.splice(destination.index, 0, add);
-      if (destination.droppableId !== source.droppableId) {
-        dispatch({ type: 'done-value', payload: add, value: false })
-      }
     } else {
+      add.isDone = true;
       complete.splice(destination.index, 0, add);
-      if (destination.droppableId !== source.droppableId)
-        dispatch({ type: 'done-value', payload: add, value: true })
     }
+    setActiveTodos(active);
+    setCompletedTodos(complete);
+    updateTodos();
   }
-  useLayoutEffect(() => {
-    setActiveTodos(todos.filter((todo: Todo) => !todo.isDone))
-    setCompletedTodos(todos.filter((todo: Todo) => todo.isDone))
-    console.log({ activeTodos, completedTodos, todos });
 
-  }, [(todos)]);
+  useLayoutEffect(() => {
+    if (initialize) {
+      let active: Todo[] = [];
+      let complete: Todo[] = [];
+      (todos as Todo[]).forEach((todo) => { !todo.isDone ? active.push(todo) : complete.push(todo) });
+      setActiveTodos(active);
+      setCompletedTodos(complete);
+      setInitialize(false);
+    }
+    console.log({ activeTodos, completedTodos, todos });
+  }, [todos, activeTodos, completedTodos, initialize]);
+
+  function updateTodos() {
+    dispatch({ type: 'update-todos', payload: [...activeTodos, ...completedTodos] })
+  }
+
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="App">
         <span className="heading">Tasify</span>
         <InputField todo={todo} setTodo={setTodo} handleAdd={handleAdd} />
-        <TodoList todos={todos} completedTodos={completedTodos} activeTodos={activeTodos} />
+        <TodoList todos={todos} completedTodos={completedTodos} activeTodos={activeTodos} setInitialize={setInitialize} />
       </div>
     </DragDropContext>
   );

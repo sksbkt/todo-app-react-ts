@@ -9,20 +9,21 @@ import { Draggable } from "react-beautiful-dnd";
 
 interface Props {
     todo: Todo,
-    index: number
+    index: number,
+    setInitialize: React.Dispatch<React.SetStateAction<boolean>>
 }
-const SingleTodo: React.FC<Props> = ({ todo, index }) => {
+const SingleTodo: React.FC<Props> = ({ todo, index, setInitialize }) => {
     const { dispatch } = TodoState();
     const [edit, setEdit] = useState<boolean>(false);
     const [editTodo, setEditTodo] = useState<string>(todo.todo);
 
     const handleDone = (todo: Todo) => {
-        dispatch({ type: 'done', payload: todo }
-        )
+        dispatch({ type: 'done', payload: todo })
+        setInitialize(true);
     }
     const handleDelete = (todo: Todo) => {
         dispatch({ type: 'remove', payload: todo });
-
+        setInitialize(true);
     }
 
     const handleEdit = (e: React.FormEvent, todo: Todo) => {
@@ -30,6 +31,7 @@ const SingleTodo: React.FC<Props> = ({ todo, index }) => {
         // setTodos(todos.map((todo) => todo.id === id ? { ...todo, todo: editTodo } : todo));
         dispatch({ type: 'edit', payload: todo, editText: editTodo })
         setEdit(false);
+        setInitialize(true);
     }
     const inputRef = useRef<HTMLInputElement>(null);
 
